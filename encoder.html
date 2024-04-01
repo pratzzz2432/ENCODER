@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>__ENCODER__</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #e6ffff;
+        }
+        form {
+            width: 300px;
+            margin: auto;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], input[type="button"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="button"] {
+            background-color: grey;
+            color: black;
+            border: 2px solid;
+            cursor: pointer;
+        }
+       
+    </style>
+</head>
+<body>
+    <h2>__ENCODER__</h2>
+    <form>
+        <label for="ip">Input String :</label><br>
+        <input type="text" id="ip" required><br>
+        <label for="base">Convert to :</label><br><br>
+        <select id="base">
+            <optgroup label="convert_to">
+                <option value="32">base-32</option>
+                <option value="64">base-64</option>
+            </optgroup>
+        </select><hr>
+        <input type="button" value="Submit" onclick="func();">
+    </form>
+    <div id="result"></div>
+
+    <script>
+        function toBinary(n) 
+        {
+            if (n === 0) {
+                return '0';
+            }
+            let binary = '';
+            while (n > 0) {
+                binary = (n % 2) + binary;
+                n = Math.floor(n / 2);
+            }
+            while (binary.length % 8 !== 0) {
+                binary = '0' + binary;
+            }
+            return binary;
+        }
+
+        function strpair(str, n) {
+            var newstr = '';
+            for (let i = 0; i < str.length; i += n) {
+                for (let j = 0; j < n; j++) {
+                    if (j === (n - 1)) {
+                        newstr += str[i + j] + ' ';
+                    } else {
+                        newstr += str[i + j];
+                    }
+                }
+            }
+            return newstr;
+        }
+        
+        function binToB64(binStr) 
+        {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+            let res = '';
+
+            while (binStr.length % 6 !== 0) binStr += '0';
+
+            for (let i = 0; i < binStr.length; i += 6) 
+            {
+                const chunk = binStr.substr(i, 6);
+                res += chars[parseInt(chunk, 2)];
+            }
+            while (res.length % 4 !== 0) res += '=';
+            return res;
+        }
+
+        function binToB32(binStr) 
+        {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            let res = '';
+
+            while (binStr.length % 5 !== 0) binStr += '0';
+
+            for (let i = 0; i < binStr.length; i += 5) 
+            {
+                const chunk = binStr.substr(i, 5);
+                res += chars[parseInt(chunk, 2)];
+            }
+            while (res.length % 8 !== 0) res += '=';
+            return res;
+        }
+
+
+        function func() {
+            var s = document.getElementById("ip").value;
+            var base = parseInt(document.getElementById("base").value); 
+            var b64, b32; 
+            switch (base) {
+                case 64:
+                    while (s.length % 3 !== 0) {
+                        s += '=';
+                    }
+                    var bstr = '';
+                    for (let i = 0; i < s.length; i++) {
+                        let n = s.charCodeAt(i); 
+                        let bi = toBinary(n);
+                        bstr += bi;
+                    }
+                    b64 = strpair(bstr, 6); 
+                    var res=binToB64(bstr); 
+                    document.getElementById('result').innerHTML = ("<h3>BINARY STRING (DIVIDIED IN 6-BIT CHUNK): </h3>" + b64+ "<br><h3> BASE-64 : "+res); 
+                    break;
+                case 32:
+                    var bstr = '';
+                    for (let i = 0; i < s.length; i++) {
+                        let n = s.charCodeAt(i); 
+                        let bi = toBinary(n);
+                        bstr += bi;
+                    }
+                    b32 = strpair(bstr, 5); 
+                    var res=binToB32(bstr); 
+                  document.getElementById('result').innerHTML = ("<h3>BINARY STRING (DIVIDIED IN 5-BIT CHUNK): </h3>" + b64+ "<br><h3> BASE-32 : "+res); 
+                    break;
+                default:
+                    alert("Wrong choice");
+            }
+        }
+    </script>
+</body>
+</html>
+
